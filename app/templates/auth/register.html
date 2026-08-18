@@ -1,0 +1,181 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for the new user registration form, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Register - Records Manager{% endblock %}
+{% block content %}
+<!-- Main registration form container, centers the registration card on the page using Bootstrap grid, (Anthropic, 2025). -->
+<div class="row justify-content-center mt-4"> 
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-plus"></i> Create New Account
+            </div>
+            <!-- Card body, contains the registration form fields and instructions for new users, (Anthropic, 2025). -->
+            <div class="card-body p-4">
+                <!-- Email input field, collects the user's email address, used as their login username, with validation and error handling, (Anthropic, 2025). -->
+                <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                                     placeholder="your.email@example.com",
+                                     autocomplete="email") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">This email will be used as your username for logging in.</small>
+                    </div>
+                    <!-- Patient ID input field, collects the user's Patient ID, must match an existing record, (Anthropic, 2025). -->
+                    <div class="mb-3">
+                        {{ form.patient_id.label(class="form-label") }}
+                        {{ form.patient_id(class="form-control" + (" is-invalid" if form.patient_id.errors else ""),
+                                          placeholder="Enter your Patient ID",
+                                          type="number") }}
+                        {% if form.patient_id.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.patient_id.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Your Patient ID must exist in our records. Contact admin if you don't know your ID.</small>
+                    </div>
+                    <!-- Password input field, allows the user to create a password, includes a visibility toggle button and strength indicator, (Anthropic, 2025). -->
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        <div class="input-group">
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                                           placeholder="Create a strong password",
+                                           autocomplete="new-password",
+                                           id="password-field") }}
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-password">
+                                <i class="fas fa-eye" id="eye-icon"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div id="password-strength" class="mt-2"></div>
+                    </div>
+                    <!-- Confirm password input field, requires the user to re-enter their password for confirmation, (Anthropic, 2025). -->
+                    <div class="mb-3">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                                                placeholder="Re-enter your password",
+                                                autocomplete="new-password") }}
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.confirm_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- Password requirements, displays a list of password rules to guide users in creating a secure password, (Anthropic, 2025). -->
+                    <div class="alert alert-light border mb-3">
+                        <small><strong>Password Requirements:</strong></small>
+                        <ul class="mb-0 mt-1" style="font-size: 0.875rem;">
+                            <li>At least 12 characters long</li>
+                            <li>Contains uppercase and lowercase letters</li>
+                            <li>Contains at least one digit</li>
+                            <li>Contains at least one special character (!@#$%^&*(),.?":{}|<>)</li>
+                        </ul>
+                    </div>
+                    <!-- Submit button section, provides a button for users to submit the registration form and create an account, (Anthropic, 2025). -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <!-- Registration link, provides navigation for users who already have an account to go to the login page, (Anthropic, 2025). -->
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{{ url_for('auth.login') }}" class="text-decoration-none">
+                            <strong>Login here</strong>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Privacy notice, informs users about password hashing, data protection, and compliance with UK GDPR regulations, (Anthropic, 2025). -->
+        <div class="alert alert-info mt-3" role="alert">
+            <i class="fas fa-lock"></i> <strong>Privacy & Security:</strong> 
+            Your password is hashed with bcrypt (12 rounds) and never stored in plain text. 
+            All data is handled in compliance with UK GDPR regulations.
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<!-- Password visibility toggle and strength indicator script, enables users to show/hide their password input and displays password strength feedback as they type, (Anthropic, 2025). -->
+<script>
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordField = document.getElementById('password-field');
+        const eyeIcon = document.getElementById('eye-icon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    });
+    document.getElementById('password-field').addEventListener('input', function() {
+        const password = this.value;
+        const strengthDiv = document.getElementById('password-strength');
+        
+        let strength = 0;
+        let feedback = [];
+        
+        if (password.length >= 12) strength++;
+        else feedback.push('At least 12 characters');
+        
+        if (/[a-z]/.test(password)) strength++;
+        else feedback.push('Lowercase letter');
+        
+        if (/[A-Z]/.test(password)) strength++;
+        else feedback.push('Uppercase letter');
+        
+        if (/\d/.test(password)) strength++;
+        else feedback.push('Number');
+        
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+        else feedback.push('Special character');
+        
+        let color, text;
+        if (strength === 0) {
+            color = ''; text = '';
+        } else if (strength <= 2) {
+            color = 'danger'; text = 'Weak';
+        } else if (strength <= 4) {
+            color = 'warning'; text = 'Moderate';
+        } else {
+            color = 'success'; text = 'Strong';
+        }
+        
+        if (text) {
+            strengthDiv.innerHTML = `<small class="text-${color}"><strong>Password Strength: ${text}</strong></small>`;
+        } else {
+            strengthDiv.innerHTML = '';
+        }
+    });
+</script>
+{% endblock %}
+

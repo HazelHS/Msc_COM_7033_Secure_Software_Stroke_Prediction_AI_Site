@@ -1,0 +1,155 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for editing a patient record, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Edit Patient Record - Records Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center"> 
+    <div class="col-md-10">
+        <div class="mb-3">
+            <a href="{{ url_for('crud.view_patient', patient_id=patient_id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Record
+            </a>
+        </div>
+        <!-- This separates the patient edit form from the rest of the page, (Anthropic, 2025). -->
+        <div class="card"> 
+            <div class="card-header">
+                <i class="fas fa-edit"></i> Edit Patient Record
+                <span class="badge bg-secondary float-end">Patient ID: {{ record.id if record.id else 'N/A' }}</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('crud.edit_patient', patient_id=patient_id) }}" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <!-- Personal Information to edit, (Anthropic, 2025). --> 
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                            <div class="mb-3">
+                                {{ form.gender.label(class="form-label") }}
+                                {{ form.gender(class="form-select" + (" is-invalid" if form.gender.errors else "")) }}
+                                {% if form.gender.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.gender.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3"> 
+                                {{ form.age.label(class="form-label") }}
+                                {{ form.age(class="form-control" + (" is-invalid" if form.age.errors else ""), placeholder="Enter age") }}
+                                {% if form.age.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.age.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.ever_married.label(class="form-label") }}
+                                {{ form.ever_married(class="form-select" + (" is-invalid" if form.ever_married.errors else "")) }}
+                                {% if form.ever_married.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.ever_married.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3"> 
+                                {{ form.work_type.label(class="form-label") }}
+                                {{ form.work_type(class="form-select" + (" is-invalid" if form.work_type.errors else "")) }}
+                                {% if form.work_type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.work_type.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.residence_type.label(class="form-label") }}
+                                {{ form.residence_type(class="form-select" + (" is-invalid" if form.residence_type.errors else "")) }}
+                                {% if form.residence_type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.residence_type.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Medical Information, (Anthropic, 2025). -->
+                        <div class="col-md-6">
+                            <h5 class="text-danger mb-3"><i class="fas fa-heartbeat"></i> Medical Information</h5>
+                            <div class="mb-3">
+                                {{ form.hypertension.label(class="form-label") }}
+                                {{ form.hypertension(class="form-select" + (" is-invalid" if form.hypertension.errors else "")) }}
+                                {% if form.hypertension.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.hypertension.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.heart_disease.label(class="form-label") }}
+                                {{ form.heart_disease(class="form-select" + (" is-invalid" if form.heart_disease.errors else "")) }}
+                                {% if form.heart_disease.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.heart_disease.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3"> 
+                                {{ form.avg_glucose_level.label(class="form-label") }}
+                                {{ form.avg_glucose_level(class="form-control" + (" is-invalid" if form.avg_glucose_level.errors else ""), 
+                                                         placeholder="e.g., 120.5") }}
+                                {% if form.avg_glucose_level.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.avg_glucose_level.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Normal range: 70-140 mg/dL</small>
+                            </div>
+                            <div class="mb-3">
+                                {{ form.bmi.label(class="form-label") }}
+                                {{ form.bmi(class="form-control" + (" is-invalid" if form.bmi.errors else ""), 
+                                           placeholder="e.g., 25.3 or N/A") }}
+                                {% if form.bmi.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.bmi.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Body Mass Index (10-100 or N/A)</small>
+                            </div>
+                            <div class="mb-3">
+                                {{ form.smoking_status.label(class="form-label") }}
+                                {{ form.smoking_status(class="form-select" + (" is-invalid" if form.smoking_status.errors else "")) }}
+                                {% if form.smoking_status.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.smoking_status.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3"> 
+                                {{ form.stroke.label(class="form-label") }}
+                                {{ form.stroke(class="form-select" + (" is-invalid" if form.stroke.errors else "")) }}
+                                {% if form.stroke.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.stroke.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- save changes button, (Anthropic, 2025). -->
+                    <hr class="my-4">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end"> 
+                        <a href="{{ url_for('crud.view_patient', patient_id=patient_id) }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

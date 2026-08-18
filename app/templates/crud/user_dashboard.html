@@ -1,0 +1,177 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for the user dashboard form, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Patient Record - Record Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center"> 
+    <div class="col-md-10">
+        <h2 class="mb-4">
+            <i class=""></i> Patient Record
+        </h2>
+        <!-- This displays the patient's current record information, (Anthropic, 2025). -->
+        {% if record %}
+        <div class="mb-3">
+            <a href="{{ url_for('crud.edit_patient', patient_id=record._id) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit My Record
+            </a>
+            <a href="{{ url_for('auth.userpage') }}" class="btn btn-secondary">
+                <i class="fas fa-user-cog"></i> Account Settings
+            </a>
+        </div>
+        <div class="card"> 
+            <div class="card-header">
+                <i class="fas fa-file-medical"></i> Patient Record Details
+                <span class="badge bg-secondary float-end">Patient ID: {{ record.id if record.id else 'N/A' }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Personal Information, (Anthropic, 2025). -->
+                    <div class="col-md-6">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th width="40%">Patient ID</th>
+                                <td><strong>{{ record.id if record.id else 'N/A' }}</strong></td>
+                            </tr>
+                            <tr>
+                                <th width="40%">Gender</th>
+                                <td>
+                                    {% if record.gender == 'Male' %}
+                                        <i class="fas fa-mars text-primary"></i> Male
+                                    {% elif record.gender == 'Female' %}
+                                        <i class="fas fa-venus text-danger"></i> Female
+                                    {% else %}
+                                        <i class="fas fa-genderless"></i> {{ record.gender }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Age</th>
+                                <td>{{ record.age }} years</td>
+                            </tr>
+                            <tr>
+                                <th>Ever Married</th>
+                                <td>{{ record.ever_married }}</td>
+                            </tr>
+                            <tr>
+                                <th>Work Type</th>
+                                <td>{{ record.work_type }}</td>
+                            </tr>
+                            <tr>
+                                <th>Residence Type</th>
+                                <td>{{ record.Residence_type }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- Medical Information, (Anthropic, 2025). -->
+                    <div class="col-md-6"> 
+                        <h5 class="text-danger mb-3">
+                            <i class="fas fa-heartbeat"></i> Medical Information
+                        </h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th width="50%">Hypertension</th>
+                                <td>
+                                    {% if record.hypertension == 1 %}
+                                        <span class="badge bg-warning">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Heart Disease</th>
+                                <td>
+                                    {% if record.heart_disease == 1 %}
+                                        <span class="badge bg-warning">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Avg Glucose Level</th>
+                                <td>
+                                    {{ "%.2f"|format(record.avg_glucose_level) }} mg/dL
+                                    {% if record.avg_glucose_level > 140 %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif record.avg_glucose_level < 70 %}
+                                        <span class="badge bg-warning">Low</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>BMI</th>
+                                <td>
+                                    {{ record.bmi }}
+                                    {% if record.bmi != 'N/A' %}
+                                        {% set bmi_value = record.bmi|float %}
+                                        {% if bmi_value < 18.5 %}
+                                            <span class="badge bg-info">Underweight</span>
+                                        {% elif bmi_value >= 18.5 and bmi_value < 25 %}
+                                            <span class="badge bg-success">Normal</span>
+                                        {% elif bmi_value >= 25 and bmi_value < 30 %}
+                                            <span class="badge bg-warning">Overweight</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Obese</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Smoking Status</th>
+                                <td>
+                                    {% if record.smoking_status == 'smokes' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-smoking"></i> Smokes
+                                        </span>
+                                    {% elif record.smoking_status == 'formerly smoked' %}
+                                        <span class="badge bg-warning">Formerly Smoked</span>
+                                    {% elif record.smoking_status == 'never smoked' %}
+                                        <span class="badge bg-success">Never Smoked</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Unknown</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Stroke History</th>
+                                <td>
+                                    {% if record.stroke == 1 %}
+                                        <span class="badge bg-danger">
+                                            <i class=""></i> Yes
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Warning displays incase of no patient record found, (Anthropic, 2025). -->
+        <div class="alert alert-warning text-center"> 
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h4>No Patient Record Found</h4>
+            <p>Your account is not linked to a patient record, or the record could not be loaded.</p>
+            <p>Please contact the administrator if you believe this is an error.</p>
+            <a href="{{ url_for('auth.userpage') }}" class="btn btn-secondary mt-3">
+                <i class="fas fa-user-cog"></i> Account Settings
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

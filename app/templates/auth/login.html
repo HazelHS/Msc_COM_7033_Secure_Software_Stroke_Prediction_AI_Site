@@ -1,0 +1,104 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for the login form, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Login - Records Manager{% endblock %}
+{% block content %}
+<!-- Main login form container, centers the login card on the page using Bootstrap grid, (Anthropic, 2025). -->
+<div class="row justify-content-center mt-5"> 
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-sign-in-alt"></i> Login to Your Account
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+                    {{ form.hidden_tag() }}
+                    <!-- Username input field, includes label, input, and error handling for user login, (Anthropic, 2025). -->
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), 
+                                        placeholder="Enter your username",
+                                        autocomplete="username") }}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- Password input field, includes label, input, password visibility toggle button, and error handling, (Anthropic, 2025). -->
+                    <div class="mb-3"> 
+                        {{ form.password.label(class="form-label") }}
+                        <div class="input-group">
+                            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                                           placeholder="Enter your password",
+                                           autocomplete="current-password",
+                                           id="password-field") }}
+                            <button class="btn btn-outline-secondary" type="button" id="toggle-password">
+                                <i class="fas fa-eye" id="eye-icon"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- "Remember Me" checkbox, allows users to stay logged in across sessions, (Anthropic, 2025). -->
+                    <div class="mb-3 form-check">
+                        {{ form.remember_me(class="form-check-input") }}
+                        {{ form.remember_me.label(class="form-check-label") }}
+                    </div>
+                    <!-- Login button section, submits the login form, (Anthropic, 2025). -->
+                    <div class="d-grid gap-2"> 
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <!-- Registration link, provides navigation for users to register if they don't have an account, (Anthropic, 2025). -->
+                <div class="text-center">
+                    <p class="mb-0">Don't have an account? 
+                        <a href="{{ url_for('auth.register') }}" class="text-decoration-none">
+                            <strong>Register here</strong>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Security notice, informs users about account lockout policy after failed login attempts, (Anthropic, 2025). -->
+        <div class="alert alert-info mt-3" role="alert">
+            <i class="fas fa-shield-alt"></i> <strong>Security Notice:</strong> 
+            After 5 failed login attempts, your account will be locked for 15 minutes.
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<!-- Password visibility toggle script, enables users to show/hide their password input. -->
+<script>
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordField = document.getElementById('password-field');
+        const eyeIcon = document.getElementById('eye-icon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    });
+</script>
+{% endblock %}
+

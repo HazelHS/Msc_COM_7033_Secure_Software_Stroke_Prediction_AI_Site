@@ -1,0 +1,266 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for the userpage form, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Account Management - Records Manager{% endblock %}
+{% block content %}
+<!-- Main account management container, Uses Bootstrap grid to center and size the content, (Anthropic, 2025). -->
+<div class="row justify-content-center"> 
+    <div class="col-md-10">
+        <h2 class="mb-4">
+            <i class=""></i> Account Management
+        </h2>
+        <!-- Account Information Card, shows user details such as username, role, patient ID, account creation date, and last login, (Anthropic, 2025). -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-info-circle"></i> Account Information
+            </div>
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ current_user.username }}</p>
+                {% if current_user.is_admin is defined and current_user.is_admin %}
+                    <p><strong>Role:</strong> <span class="badge bg-danger">Administrator</span></p>
+                    <p><strong>Email:</strong> 
+                        {% if current_user.email %}
+                            {{ current_user.email }}
+                            <span class="badge bg-success"><i class="fas fa-shield-alt"></i> 2FA Enabled</span>
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                            <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> 2FA Disabled</span>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p><strong>Patient ID:</strong> 
+                        {% if current_user.patient_id %}
+                            {{ current_user.patient_id }}
+                        {% else %}
+                            Not linked
+                        {% endif %}
+                    </p>
+                {% endif %}
+                <p><strong>Account Created:</strong> {{ current_user.created_at.strftime('%Y-%m-%d %H:%M') if current_user.created_at else 'N/A' }}</p>
+                <p><strong>Last Login:</strong> {{ current_user.last_login.strftime('%Y-%m-%d %H:%M') if current_user.last_login else 'N/A' }}</p>
+            </div>
+        </div>
+        <!-- Change Password Card, Contains a form for users to update their password with validation and requirements, (Anthropic, 2025). -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-key"></i> Change Password
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Update your password to keep your account secure.</p>
+                <form method="POST" action="{{ url_for('auth.change_password') }}">
+                    {{ change_password_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ change_password_form.current_password.label(class="form-label") }}
+                        {{ change_password_form.current_password(class="form-control") }}
+                        {% if change_password_form.current_password.errors %}
+                            <div class="text-danger">
+                                {% for error in change_password_form.current_password.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ change_password_form.new_password.label(class="form-label") }}
+                        {{ change_password_form.new_password(class="form-control") }}
+                        <small class="form-text text-muted">
+                            Must be at least 12 characters with uppercase, lowercase, number, and special character.
+                        </small>
+                        {% if change_password_form.new_password.errors %}
+                            <div class="text-danger">
+                                {% for error in change_password_form.new_password.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ change_password_form.confirm_new_password.label(class="form-label") }}
+                        {{ change_password_form.confirm_new_password(class="form-control") }}
+                        {% if change_password_form.confirm_new_password.errors %}
+                            <div class="text-danger">
+                                {% for error in change_password_form.confirm_new_password.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-check"></i> Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- Change Email Card, only shown for users, (Anthropic, 2025). -->
+        {% if not (current_user.is_admin is defined and current_user.is_admin) %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-envelope"></i> Change Email/Username
+            </div>
+            <div class="card-body"> 
+                <p class="text-muted mb-3">
+                    <i class="fas fa-info-circle"></i> Your email address is used as your username for logging in.
+                </p>
+                <form method="POST" action="{{ url_for('auth.change_email') }}">
+                    {{ change_email_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ change_email_form.new_email.label(class="form-label") }}
+                        {{ change_email_form.new_email(class="form-control", placeholder="newemail@example.com") }}
+                        {% if change_email_form.new_email.errors %}
+                            <div class="text-danger">
+                                {% for error in change_email_form.new_email.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3"> 
+                        {{ change_email_form.current_password.label(class="form-label") }}
+                        {{ change_email_form.current_password(class="form-control") }}
+                        {% if change_email_form.current_password.errors %}
+                            <div class="text-danger">
+                                {% for error in change_email_form.current_password.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-check"></i> Change Email
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <!-- Admin Email Management -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-envelope"></i> Email & Two-Factor Authentication
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    <i class="fas fa-info-circle"></i> Add an email address to enable two-factor authentication for enhanced security.
+                </p>
+                {% if current_user.email %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> 2FA is currently <strong>enabled</strong> for your account.
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 2FA is currently <strong>disabled</strong>. Add an email to enable it.
+                    </div>
+                {% endif %}
+                <form method="POST" action="{{ url_for('auth.admin_change_email') }}">
+                    {% set admin_email_form = change_email_form.__class__() if current_user.email else change_email_form.__class__() %}
+                    {{ admin_email_form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="new_email" class="form-label">
+                            {% if current_user.email %}Update Email Address{% else %}Add Email Address{% endif %}
+                        </label>
+                        <input type="email" class="form-control" id="new_email" name="new_email" 
+                               placeholder="admin@example.com" value="{{ current_user.email or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password">
+                    </div>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-check"></i> {% if current_user.email %}Update Email{% else %}Add Email{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+        <!-- Delete Account Card, only shown for users, (Anthropic, 2025). -->
+        {% if not (current_user.is_admin is defined and current_user.is_admin) %}
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="fas fa-trash"></i> Right to be forgotten
+            </div>
+            <div class="card-body">
+                <h5 class="text-danger">Delete Account</h5>
+                <p class="text-muted">
+                    Under GDPR you have the right to be forgotten, once your account is deleted it will be permanently removed including all data stored.
+                </p>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash"></i> Delete My Account
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-shield-alt"></i> <strong>Administrator Account:</strong> 
+            Admin accounts cannot be deleted
+        </div>
+        {% endif %}
+        <!-- Back Button, (Anthropic, 2025). -->
+        <div class="mt-4">
+            {% if current_user.is_admin is defined and current_user.is_admin %}
+                <a href="{{ url_for('crud.dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('crud.user_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to My Record
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Delete Account Confirmation Modal, Shown when user clicks delete account, requires password and confirmation text, (Anthropic, 2025). -->
+{% if not (current_user.is_admin is defined and current_user.is_admin) %}
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class=""></i> Confirm Account Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('auth.delete_account') }}">
+                {{ delete_account_form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">This Action is Perminent</h6>
+                    </div>
+                    <div class="mb-3"> 
+                        {{ delete_account_form.confirm_password.label(class="form-label") }}
+                        {{ delete_account_form.confirm_password(class="form-control") }}
+                        {% if delete_account_form.confirm_password.errors %}
+                            <div class="text-danger">
+                                {% for error in delete_account_form.confirm_password.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3"> 
+                        {{ delete_account_form.confirm_text.label(class="form-label") }}
+                        {{ delete_account_form.confirm_text(class="form-control", placeholder="DELETE") }}
+                        {% if delete_account_form.confirm_text.errors %}
+                            <div class="text-danger">
+                                {% for error in delete_account_form.confirm_text.errors %}
+                                    <small>{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer"> 
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Permanently Delete Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

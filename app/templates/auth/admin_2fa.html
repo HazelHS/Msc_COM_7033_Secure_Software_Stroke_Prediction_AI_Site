@@ -1,0 +1,58 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page is for admin 2FA verification, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Two-Factor Authentication - Records Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-shield-alt"></i> Two-Factor Authentication
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> A 6-digit verification code has been sent to your email address. Please enter it below to complete your login.
+                </div>
+                
+                <form method="POST" action="{{ url_for('auth.admin_2fa') }}" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.code.label(class="form-label") }}
+                        {{ form.code(class="form-control form-control-lg text-center" + (" is-invalid" if form.code.errors else ""), 
+                                    placeholder="000000", maxlength="6", autocomplete="off") }}
+                        {% if form.code.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.code.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            <i class="fas fa-clock"></i> Code expires in 10 minutes
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check"></i> Verify Code
+                        </button>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Login
+                        </a>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="text-muted mb-2">Didn't receive the code?</p>
+                    <p class="text-muted small">Please check your spam folder or contact support if the code doesn't arrive within a few minutes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

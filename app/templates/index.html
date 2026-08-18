@@ -1,0 +1,110 @@
+<!--
+AI declaration:
+Github copilot was used for portions of the planning, research, feedback and editing of the software artefact. Mostly utilised for syntax, logic and error checking with ChatGPT and Claude Sonnet 4.5 used as the models.
+
+This HTML page for the front page or home screen, using Jinja2 and py Flask templating, with Bootstrap 5 for styling and FontAwesome for icons.
+-->
+{% extends "base.html" %}
+{% block title %}Home - Records Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5"> <!-- Home page title screen, (Anthropic, 2025) -->
+    <!-- "div" is a container tag, and "class" is an attribute used to specify a CSS class for styling (calls the bootstrap and CSS from "base.html"), along with "style=". This makes up the majority how html and css works together in these forms. -->
+    <div class="col-md-10">
+        <div class="text-center mb-5">
+            <i class="" style="font-size: 4rem; color: #e74c3c;"></i>
+            <h1 class="display-4 mt-3">COM7033 Healthcare Records Manager</h1>
+            <p class="lead text-muted">A secure dataset management app for stroke predictions using patient records.</p>
+        </div>
+
+        {% if not mongodb_connected %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> MongoDB no connection detected</h5>
+            <p>The MongoDB database is not currently connected. Patient records functionality will be unavailable.</p>
+            <hr>
+            <p class="mb-0">
+                <strong>If required please run MongoDB from the portable folder setup.</strong><br>
+            </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        <!-- The card that displays the application's functionality, (Anthropic, 2025). -->
+        <div class="card"> 
+            <div class="card-header bg-secondary">
+                <i class="fas fa-info-circle"></i> About:
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class=""></i>
+                                Welcome to this Healthcare Records Manager application. <br><br>
+                                This platform is designed to securely manage and store patient healthcare records, 
+                                for use in stroke prediction AI modelling, to help try and find new ways to improve outcomes for participating patients. <br><br>
+                                The data collected on each patient is strictly confidential and is protected in accordance with both GDPR regulations and NHS data security standards.
+                                Along with strong security developed techniques to ensure even in the event of a data breach, patient data remains protected. <br><br>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class=""></i>
+                                Please use the login or registration buttons bellow, or at the top right of the page to access this application. 
+                                If you are a new user, you will need a valid patient ID number and email address to complete the registration process. <br><br>
+                                Thank you for using this application, have a great day!
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- The card that displays the site's compliance information, (Anthropic, 2025). -->
+        <div class="card"> 
+            <div class="card-header bg-primary">
+                <i class="fas fa-info-circle"></i> Compliance:
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="list-unstyled">
+                            <li><i class=""></i> 
+                                This application is complient with GDPR regulations, NHS data security standards and the 
+                                "Open Worldwide Application Security Project" (OWASP) guidelines. <br><br>
+                                Including multiple security testing techniques inlcuding with OWASP's ZAP toolkit.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class=""></i></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Displays the different user action buttons, (Anthropic, 2025). -->
+        <div class="text-center mt-5 mb-4"> 
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_admin is defined and current_user.is_admin %}
+                    <a href="{{ url_for('crud.dashboard') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-th-large"></i> Go to Admin Dashboard
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('crud.user_dashboard') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-file-medical-alt"></i> View My Record
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('auth.userpage') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-user-cog"></i> Account Settings
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
